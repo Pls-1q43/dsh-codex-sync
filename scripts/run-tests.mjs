@@ -15,6 +15,7 @@ const suites = [
   'test/export-codex.test.mjs',
   'test/item-sync.test.mjs',
   'test/mcp-live.test.mjs',
+  'test/runtime-compat.test.mjs',
   'test/package-contents.test.mjs',
   'test/convert-order.test.mjs',
   'test/session-repair.test.mjs',

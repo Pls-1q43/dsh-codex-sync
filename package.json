@@ -55,8 +55,8 @@
   ],
   "scripts": {
     "test": "node scripts/run-tests.mjs",
-    "test:current": "npm ci --prefix test/current-runtime --ignore-scripts && node --test test/skills-current.test.mjs",
-    "test:native": "npm ci --prefix test/native-runtime --ignore-scripts && node --test test/mcp-native.test.mjs",
+    "test:current": "node scripts/run-contract-tests.mjs skills",
+    "test:native": "node scripts/run-contract-tests.mjs native",
     "test:package": "node --test test/package-contents.test.mjs"
   },
   "bin": {
@@ -76,11 +76,12 @@
     }
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "dsh": "^0.0.1-rc.1 || >=0.2.0-rc.2 <0.3.0-0"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-mcp-client": "^0.0.1-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.2"
+    "@deepseek-ai/dsh-mcp-client": "^0.0.1-rc.1 || >=0.2.0-rc.2 <0.3.0-0 || >=0.2.1-rc.2 <0.3.0-0"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/dsh-mcp-client": {
@@ -94,6 +95,8 @@
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/schemastery": "~3.18.5",
+    "semver": "^7.7.2",
     "@deepseek-ai/dsh-session-format-catalog": "0.1.7-rc.2",
     "@deepseek-ai/dsh-session-format-v0-to-v1": "0.1.7-rc.2",
     "@deepseek-ai/dsh-session-format-v1-to-v2": "0.1.7-rc.2",

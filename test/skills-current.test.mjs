@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { createRequire } from 'node:module'
+import { runtimeRequire } from '../scripts/run-contract-tests.mjs'
 import { pathToFileURL } from 'node:url'
 import { mkdir, writeFile, rename, unlink } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
@@ -9,9 +9,9 @@ import { temporary, environment, eventually } from './live-helpers.mjs'
 import * as plugin from '../lib/index.js'
 import { registerCodexSkillProvider } from '../lib/skill-provider.js'
 
-// Isolate current DSH peers from the historical session-format fixtures used by
-// the rest of the suite. npm run test:current installs this locked fixture first.
-const require = createRequire(new URL('./current-runtime/package.json', import.meta.url))
+// Isolate each supported DSH peer graph from the historical session-format
+// fixtures. The runner installs locked fixtures and selects each via the allowlist.
+const require = runtimeRequire('skills')
 const { Context, Service } = await import(pathToFileURL(require.resolve('@deepseek-ai/cordis')).href)
 const { default: Skills } = await import(pathToFileURL(require.resolve('@deepseek-ai/dsh-skill')).href)
 const skill = (name, body = 'body', extra = '') => `---\nname: ${name}\ndescription: Description for ${name}\n${extra}---\n${body}\n`

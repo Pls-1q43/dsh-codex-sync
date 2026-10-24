@@ -2,9 +2,18 @@
 
 ## Scope
 
-The compatibility update admits the **0.2.1-rc.2 MCP client** explicitly, without a version exemption. It keeps the existing package identity, commands, UI response shapes, per-item state schema and within-layer Codex skill rank (800). The import/export and reverse-installer implementations are not redesigned by this update.
+The compatibility update admits a **bounded DSH 0.2 patch/prerelease family, including 0.2.1-rc.3**, without a version exemption or exact-RC checks. It keeps the existing package identity, commands, UI response shapes, per-item state schema and within-layer Codex skill rank (800). The import/export and reverse-installer implementations are not redesigned by this update.
 
 Home resolution is `config.codexHome`, then a nonempty `CODEX_HOME`, then `~/.codex`. Directory overrides are generic configuration, not application-installation or user-specific paths. No runtime inventory, credentials, personal acceptance record or profile configuration belongs in the package or PR.
+
+## Upgrade resilience
+
+- `engines.dsh` admits `^0.0.1-rc.1 || >=0.2.0-rc.2 <0.3.0-0`. The legacy branch is retained, not newly certified; the 0.3 boundary includes its prereleases. An allowed version is only a candidate for the runtime API checks, not a guarantee of future implementation semantics.
+- Only enabled MCP servers load the native client. Before any executable lookup, child creation or network operation, verify the plugin/Config exports, the selected transport's explicitly declared fields (including nested reconnect), and every supplied setting after native validation.
+- Schemastery passes through unknown keys, so successful validation or a simple round trip is insufficient. Missing fields or unfamiliar schema forms reject the affected server. New native defaults are allowed; supplied env/header maps cannot acquire extra entries. Never return native validation errors that could embed configuration values.
+- Skills still use this plugin's watched provider, priorities and preferences—not a replacement native filesystem provider. Unsupported registry/control contracts stop that optional registration, clean partial registrations/watchers and leave commands/MCP active. Service replacement retries via the existing owned injection scope.
+- When the optional subprocess service exists, stdio requires its supported resolver method. In standalone/legacy deployments without it, the native SDK retains its own executable resolution. A changed stdio resolver does not disable HTTP clients. Native reconnect, dependency waiting, startup deadlines and late-child cleanup remain independently owned.
+- Native API failure is a static, credential-free per-server/feature diagnostic. Actual breaking changes still require adaptation; the range is not a promise of indefinite compatibility. The npm peer hint is separate from DSH Host admission; see [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## Skills
 
@@ -53,9 +62,10 @@ npm run test:native
 npm run test:package
 ```
 
-- Main suite: existing session/client/command regressions plus actual Cordis lifecycle, full-TOML mapping, full-pipeline cancellation, independent revocation and atomic-save tests.
-- `test:current`: isolated DSH SkillRegistry 0.2.1-rc.2 / Cordis 4.0.5; populate real caches, then test commands/HTTP toggles and external file changes, missing roots and unload.
-- `test:native`: isolated native MCP client 0.2.1-rc.2. A hermetic stdio fixture answers initialize/list/call; verify discover/call/dispose/re-add, recovery after initial failure and late arrival of the tools service. No network endpoint is used.
+- Main suite: existing session/client/command regressions plus actual Cordis lifecycle, full-TOML mapping, full-pipeline cancellation, independent revocation, atomic-save and upgrade-contract tests. SemVer boundary tables distinguish the Host's prerelease policy from npm peer matching; negative native-schema cases prove unknown/nested fields cannot bypass the guard.
+- `test:current`: isolated locked DSH SkillRegistry 0.2.1-rc.2 and 0.2.1-rc.3 / Cordis 4.0.5; populate real caches, then test commands/HTTP toggles and external file changes, missing roots and unload.
+- `test:native`: isolated locked native MCP clients 0.2.0-rc.2, 0.2.1-rc.2 and 0.2.1-rc.3. A hermetic stdio fixture answers initialize/list/call; verify discover/call/dispose/re-add, recovery after initial failure and late arrival of the tools service. No network endpoint is used.
+- Both contract runners install each selected locked fixture with `npm ci --ignore-scripts`, then execute tests using the same Node executable. For one graph, pass its allowlisted directory, e.g. `npm run test:current -- test/current-runtime-rc3` or `npm run test:native -- test/native-runtime-rc3`; the equivalent environment selector is `DSH_CONTRACT_FIXTURE`. Unknown/path-traversal/cross-suite selections fail before installation.
 - Packaging gate: inspect the **actual tarball**, require runtime/schema/locale/icon/license resources, and reject runtime artifacts, private paths, credential-shaped literals and local deployment documents.
 
 CI exercises the portable contract suites on Node 20/22 and current native SDK fixtures on Node 24. Composition checks are separate from lifecycle/protocol tests; a successful `--dump-config` is not a boot or visual acceptance claim. No full Desktop GUI, restart, or all-host/all-platform certification follows merely from these tests. The unchanged legacy peer range is not a claim that every historical/future runtime has been newly verified.

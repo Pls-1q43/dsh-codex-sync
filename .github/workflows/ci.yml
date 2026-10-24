@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dsh: [0.2.0-rc.2, 0.2.1-rc.2]
+        dsh: [0.2.0-rc.2, 0.2.1-rc.2, 0.2.1-rc.3]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -80,15 +80,18 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [20, 22]
+        fixture: [current-runtime, current-runtime-rc3]
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
       - run: npm ci --ignore-scripts
-      - run: npm run test:current
+      - name: Locked Skills contract for one supported runtime
+        run: npm run test:current -- test/${{ matrix.fixture }}
 
   native-mcp-contract:
     runs-on: ${{ matrix.os }}
@@ -97,12 +100,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        fixture: [native-runtime, native-runtime-rc3, native-runtime-020-rc2]
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 24
       - run: npm ci --ignore-scripts
-      - run: npm run test:native
+      - name: Locked native MCP contract for one supported runtime
+        run: npm run test:native -- test/${{ matrix.fixture }}

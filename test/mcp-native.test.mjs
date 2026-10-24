@@ -1,13 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { createRequire } from 'node:module'
+import { runtimeRequire } from '../scripts/run-contract-tests.mjs'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { launchMcp } from '../lib/mcp-lifecycle.js'
 import { mountMcpServers } from '../lib/mcp.js'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { temporary, eventually } from './live-helpers.mjs'
-const require = createRequire(new URL('./native-runtime/package.json', import.meta.url))
+const require = runtimeRequire('native')
 const { Context, Service } = await import(pathToFileURL(require.resolve('@deepseek-ai/cordis')).href)
 const { default: Tools } = await import(pathToFileURL(require.resolve('@deepseek-ai/dsh-tools')).href)
 const native = await import(pathToFileURL(require.resolve('@deepseek-ai/dsh-mcp-client')).href)

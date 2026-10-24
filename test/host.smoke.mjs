@@ -57,7 +57,7 @@ function installFakeMcpClient() {
   process.env.DSH_CX_SYNC_MCP_CLIENT_DIR = fakeRoot
   mkdirSync(FAKE, { recursive: true })
   writeFileSync(join(FAKE, 'package.json'), JSON.stringify({ name: '@deepseek-ai/dsh-mcp-client', version: '0.0.0-fake', type: 'module', main: 'index.js' }))
-  writeFileSync(join(FAKE, 'index.js'), 'export default class FakeMcpClient { constructor() {} }\n')
+  writeFileSync(join(FAKE, 'index.js'), `export { Config } from ${JSON.stringify(new URL('./mcp-schema-fixture.mjs', import.meta.url).href)};\nexport default class FakeMcpClient { constructor() {} }\n`)
 }
 function removeFakeMcpClient() {
   // Only the uniquely-created OS-temporary fixture; never an installed peer.

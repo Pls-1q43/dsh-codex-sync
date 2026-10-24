@@ -6,6 +6,7 @@ import { Context } from '@deepseek-ai/cordis'
 import { parseCodexMcpServers, toMcpClientConfig, silenceStdio, startMcpMirror } from '../lib/mcp.js'
 import { startupTimeout, safeMcpError, isReverseBridge } from '../lib/mcp-config.js'
 import { launchMcp } from '../lib/mcp-lifecycle.js'
+import { Config } from './mcp-schema-fixture.mjs'
 import { temporary, environment, eventually, deferred, delay } from './live-helpers.mjs'
 
 const server = (name, argument = 'ok') => `[mcp_servers.${name}]\ncommand='synthetic-executable'\nargs=['${argument}']\n`
@@ -15,7 +16,7 @@ function runtime() {
   const calls = []
   const entered = new Map()
   const closures = new Map()
-  const plugin = { name: 'mcp-contract-fixture', async apply(inner, cfg) {
+  const plugin = { name: 'mcp-contract-fixture', Config, async apply(inner, cfg) {
     if (active.has(cfg.serverName)) throw new Error('duplicate fixture namespace')
     active.add(cfg.serverName); calls.push(`start:${cfg.serverName}:${cfg.args[0]}`)
     inner.effect(() => async () => {

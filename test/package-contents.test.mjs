@@ -31,7 +31,7 @@ test('actual npm tarball contains runtime resources, not local data or credentia
   const packed = JSON.parse(execFileSync(npm, args, { cwd: ROOT, encoding: 'utf8', ...(!npmCli && process.platform === 'win32' ? { shell: true } : {}) }))[0]
   assert.ok(packed.filename && !packed.filename.includes('/') && !packed.filename.includes('\\'))
   const files = archiveFiles(await readFile(join(f.root, packed.filename)))
-  for (const name of ['package.json', 'cordis.patch.yml', 'lib/index.js', 'lib/client.js', 'lib/mcp.js', 'lib/mcp-config.js', 'lib/mcp-lifecycle.js', 'lib/skill-provider.js', 'locale/en.json', 'locale/zh.json', 'icon.svg', 'LICENSE', 'NOTICE']) assert.ok(files.has(name), `missing required resource: ${name}`)
+  for (const name of ['package.json', 'cordis.patch.yml', 'lib/index.js', 'lib/client.js', 'lib/mcp.js', 'lib/mcp-config.js', 'lib/mcp-lifecycle.js', 'lib/runtime-compat.js', 'lib/skill-provider.js', 'locale/en.json', 'locale/zh.json', 'icon.svg', 'LICENSE', 'NOTICE']) assert.ok(files.has(name), `missing required resource: ${name}`)
   assert.match(files.get('icon.svg').toString(), /<svg\b[^>]*xmlns=/u)
   for (const locale of ['en', 'zh']) {
     const meta = JSON.parse(files.get(`locale/${locale}.json`)).meta
